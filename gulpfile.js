@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var source = require('vinyl-source-stream'); // Used to stream bundle for further handling
 var browserify = require('browserify'); // Our app bundler
-var watchify = require('watchify'); //
+var watchify = require('watchify'); // Update any source file and your bundle will be recompiled on the spot.
 var reactify = require('reactify');
 var gulpif = require('gulp-if');
 var uglify = require('gulp-uglify');
@@ -11,7 +11,7 @@ var concat = require('gulp-concat');
 var cssmin = require('gulp-cssmin');
 var gutil = require('gulp-util');
 var shell = require('gulp-shell');
-var glob = require('glob');
+var glob = require('glob'); // Match files using the patterns
 var livereload = require('gulp-livereload');
 var jasminePhantomJs = require('gulp-jasmine2-phantomjs');
 var connect = require('gulp-connect');
@@ -73,7 +73,9 @@ var browserifyTask = function (options) {
 			entries: testFiles,
 			debug: true, // Gives us sourcemapping
 			transform: [reactify],
-			cache: {}, packageCache: {}, fullPaths: true // Requirement of watchify
+      fullPaths: true,
+			cache: {}, packageCache: {}, // Requirement of watchify
+      plugin: [watchify]
 		});
 
 		testBundler.external(dependencies);
@@ -91,7 +93,6 @@ var browserifyTask = function (options) {
 	      }));
   	};
 
-    testBundler = watchify(testBundler);
     testBundler.on('update', rebundleTests);
     rebundleTests();
 

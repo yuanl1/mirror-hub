@@ -6,7 +6,7 @@ describe("App", function() {
 
   it("should render text: Hello world!", function() {
     var app = TestUtils.renderIntoDocument(React.createElement(App));
-    expect(React.findDOMNode(app).textContent).toEqual('Hello world!');
+    expect(React.findDOMNode(app).textContent).toEqual('Hello World!');
   });
 
 });
