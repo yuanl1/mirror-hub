@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var source = require('vinyl-source-stream'); // Used to stream bundle for further handling
-var browserify = require('browserify');
-var watchify = require('watchify');
+var browserify = require('browserify'); // Our app bundler
+var watchify = require('watchify'); //
 var reactify = require('reactify');
 var gulpif = require('gulp-if');
 var uglify = require('gulp-uglify');
@@ -30,7 +30,8 @@ var browserifyTask = function (options) {
 		entries: [options.src], // Only need initial file, browserify finds the rest
    	transform: [reactify], // We want to convert JSX to normal javascript
 		debug: options.development, // Gives us sourcemapping
-		cache: {}, packageCache: {}, fullPaths: options.development // Requirement of watchify
+    fullPaths: options.development,
+		cache: {}, packageCache: {}, // Requirement of watchify
 	});
 
 	// We set our dependencies as externals on our app bundler when developing
@@ -55,7 +56,7 @@ var browserifyTask = function (options) {
 
   // Fire up Watchify when developing
   if (options.development) {
-    appBundler = watchify(appBundler);
+    appBundler.plugin(watchify);
     appBundler.on('update', rebundle);
   }
 
