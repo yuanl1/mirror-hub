@@ -1,1 +1,1 @@
-NODE_ENV=production gulp deploy
+NODE_ENV=production gulp production

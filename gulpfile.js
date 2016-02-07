@@ -29,13 +29,13 @@ var browserifyTask = function (options) {
 	var appBundler = browserify({
 		entries: [options.src], // Only need initial file, browserify finds the rest
    	transform: [reactify], // We want to convert JSX to normal javascript
-		debug: options.development, // Gives us sourcemapping
-    fullPaths: options.development,
+		debug: options.env == 'development', // Gives us sourcemapping
+    fullPaths: options.env == 'development',
 		cache: {}, packageCache: {}, // Requirement of watchify
 	});
 
 	// We set our dependencies as externals on our app bundler when developing
-	(options.development ? dependencies : []).forEach(function (dep) {
+	(options.env == 'development' ? dependencies : []).forEach(function (dep) {
 		appBundler.external(dep);
 	});
 
@@ -46,16 +46,16 @@ var browserifyTask = function (options) {
     appBundler.bundle()
       .on('error', gutil.log)
       .pipe(source('main.js'))
-      .pipe(gulpif(!options.development, streamify(uglify())))
+      .pipe(gulpif(options.env == 'production', streamify(uglify())))
       .pipe(gulp.dest(options.dest))
-      .pipe(gulpif(options.development, livereload()))
+      .pipe(gulpif(options.env == 'development', livereload()))
       .pipe(notify(function () {
         console.log('APP bundle built in ' + (Date.now() - start) + 'ms');
       }));
   };
 
   // Fire up Watchify when developing
-  if (options.development) {
+  if (options.env == 'development') {
     appBundler.plugin(watchify);
     appBundler.on('update', rebundle);
   }
@@ -66,7 +66,7 @@ var browserifyTask = function (options) {
   // should not rebundle on file changes. This only happens when
   // we develop. When deploying the dependencies will be included
   // in the application bundle
-  if (options.development) {
+  if (options.env == 'development') {
 
   	var testFiles = glob.sync('./specs/**/*-spec.js');
 		var testBundler = browserify({
@@ -107,7 +107,7 @@ var browserifyTask = function (options) {
     vendorsBundler.bundle()
       .on('error', gutil.log)
       .pipe(source('vendors.js'))
-      .pipe(gulpif(!options.development, streamify(uglify())))
+      .pipe(gulpif(options.env == 'production', streamify(uglify())))
       .pipe(gulp.dest(options.dest))
       .pipe(notify(function () {
         console.log('VENDORS bundle built in ' + (Date.now() - start) + 'ms');
@@ -118,7 +118,7 @@ var browserifyTask = function (options) {
 }
 
 var cssTask = function (options) {
-    if (options.development) {
+    if (options.env == 'development') {
       var run = function () {
         console.log(arguments);
         var start = new Date();
@@ -141,17 +141,17 @@ var cssTask = function (options) {
 }
 
 // Starts our development workflow
-gulp.task('default', function () {
+gulp.task('development', function () {
   livereload.listen();
 
   browserifyTask({
-    development: true,
+    env: 'development',
     src: './app/main.js',
     dest: './build'
   });
 
   cssTask({
-    development: true,
+    env: 'development',
     src: './styles/**/*.css',
     dest: './build'
   });
@@ -163,18 +163,23 @@ gulp.task('default', function () {
 
 });
 
-gulp.task('deploy', function () {
+gulp.task('production', function () {
 
   browserifyTask({
-    development: false,
+    env: 'production',
     src: './app/main.js',
     dest: './dist'
   });
 
   cssTask({
-    development: false,
+    env: 'production',
     src: './styles/**/*.css',
     dest: './dist'
+  });
+
+  connect.server({
+    root: 'dist/',
+    port: 8888
   });
 
 });
