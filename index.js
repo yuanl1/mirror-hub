@@ -2,7 +2,12 @@ var express = require('express');
 var app = express();
 var api = require('./api/api.js');
 
-app.use(express.static('build'));
+// Set the static files directory
+var static_dir = app.get("env") == 'production' ? 'dist' : 'build';
+app.use(express.static(static_dir));
+
+
+// Set the API endpoints
 app.use('/api', api);
 
 
