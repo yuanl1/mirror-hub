@@ -1,4 +1,4 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
-var App = require('./App.js');
-ReactDOM.render(<App/>, document.body);
+var Hello = require('./components/Hello.js');
+ReactDOM.render(<Hello/>, document.body);
