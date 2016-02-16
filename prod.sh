@@ -1,1 +1,2 @@
-NODE_ENV=production gulp production
+gulp build-production
+NODE_ENV=production node .

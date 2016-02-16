@@ -12,7 +12,7 @@ var shell = require('gulp-shell');
 var glob = require('glob'); // Match files using the patterns
 var livereload = require('gulp-livereload');
 var jasminePhantomJs = require('gulp-jasmine2-phantomjs');
-var connect = require('gulp-connect');
+var nodemon = require('gulp-nodemon');
 
 // External dependencies you do not want to rebundle while developing,
 // but include in your application deployment
@@ -103,13 +103,11 @@ var browserifyTask = function (options) {
           }));
     };
 
-
+    rebundleTests();
+    bundleVendors();
   }
 
   rebundleApp();
-  rebundleTests();
-  bundleVendors();
-
 };
 
 var cssTask = function (options) {
@@ -150,14 +148,14 @@ gulp.task('development', function () {
     dest: './build'
   });
 
-  connect.server({
-    root: 'build/',
-    port: 8889
+  nodemon({
+    script: 'index.js',
+    env: { 'NODE_ENV': 'development' }
   });
 
 });
 
-gulp.task('production', function () {
+gulp.task('build-production', function () {
 
   browserifyTask({
     env: 'production',
@@ -169,11 +167,6 @@ gulp.task('production', function () {
     env: 'production',
     src: './styles/**/*.css',
     dest: './dist'
-  });
-
-  connect.server({
-    root: 'dist/',
-    port: 8888
   });
 
 });
