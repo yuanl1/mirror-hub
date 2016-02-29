@@ -13,6 +13,7 @@ var glob = require('glob'); // Match files using the patterns
 var livereload = require('gulp-livereload');
 var jasminePhantomJs = require('gulp-jasmine2-phantomjs');
 var nodemon = require('gulp-nodemon');
+var less = require('gulp-less');
 
 // External dependencies you do not want to rebundle while developing,
 // but include in your application deployment
@@ -116,8 +117,12 @@ var cssTask = function (options) {
       var start = new Date();
       console.log('Building CSS bundle');
       gulp.src(options.src)
+        .pipe(less({
+          paths: []
+        }))
         .pipe(concat('main.css'))
         .pipe(gulp.dest(options.dest))
+        .pipe(livereload())
         .pipe(notify(function () {
           console.log('CSS bundle built in ' + (Date.now() - start) + 'ms');
         }));
@@ -138,13 +143,13 @@ gulp.task('development', function () {
 
   browserifyTask({
     env: 'development',
-    src: './app/main.js',
+    src: './app/main.jsx',
     dest: './build'
   });
 
   cssTask({
     env: 'development',
-    src: './styles/**/*.css',
+    src: './styles/**/*.less',
     dest: './build'
   });
 
@@ -159,13 +164,13 @@ gulp.task('build-production', function () {
 
   browserifyTask({
     env: 'production',
-    src: './app/main.js',
+    src: './app/main.jsx',
     dest: './dist'
   });
 
   cssTask({
     env: 'production',
-    src: './styles/**/*.css',
+    src: './styles/**/*.less',
     dest: './dist'
   });
 

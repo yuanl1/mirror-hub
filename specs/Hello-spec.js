@@ -1,4 +1,4 @@
-var Hello = require('./../app/components/Hello.js');
+var Hello = require('./../app/components/Hello.jsx');
 var React = require('react/addons');
 var TestUtils = React.addons.TestUtils;
 
